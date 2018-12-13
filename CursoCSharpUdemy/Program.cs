@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Collections.Generic;
 using CursoCSharpUdemy.Entities;
-using CursoCSharpUdemy.Entities.Enums;
 
 namespace CursoCSharpUdemy
 {
@@ -10,44 +9,32 @@ namespace CursoCSharpUdemy
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Enter client data:");
-            Console.Write("Name: ");
-            string name = Console.ReadLine();
-            Console.Write("Email: ");
-            string email = Console.ReadLine();
-            Console.Write("Birth date (DD/MM/YYYY): ");
-            DateTime birthDate = DateTime.Parse(Console.ReadLine());
+            Account acc = new Account(1001, "Alex", 0.0);
+            BusinessAccount bacc = new BusinessAccount(1002, "Maria", 0.0, 500.0);
 
-            Client client = new Client(name, email, birthDate);
+            // Upcasting
+            Account acc1 = bacc;
+            Account acc2 = new BusinessAccount(1003, "Bob", 0.0, 200.0);
+            Account acc3 = new SavingsAccount(1004, "Anna", 0.0, 0.01);
 
-            Console.WriteLine("\nEnter order data:");
-            Console.Write("Status (PendingPayment/Processing/Shipped/Delivered): ");
-            OrderStatus status = Enum.Parse<OrderStatus>(Console.ReadLine());
-
-            Order order = new Order(DateTime.Now, status, client);
-
-            Console.Write("How many items to this order? ");
-            int itemQtty = int.Parse(Console.ReadLine());
-
-            for (int i = 1; i <= itemQtty; i++)
+            // Downcasting
+            BusinessAccount acc4 = (BusinessAccount)acc2;
+            acc4.Loan(100.0);
+            // BusinessAccount acc5 = (BusinessAccount)acc3; -- Erro em tempo de execução!
+            if (acc3 is BusinessAccount)
             {
-                Console.WriteLine("\nEnter #" + i + " item data:");
-                Console.Write("Product name: ");
-                string productName = Console.ReadLine();
-                Console.Write("Product price: ");
-                double productPrice = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-
-                Product product = new Product(productName, productPrice);
-
-                Console.Write("Quantity: ");
-                int productQtty = int.Parse(Console.ReadLine());
-
-                OrderItem item = new OrderItem(product, productQtty);
-                order.AddOrderItem(item);
+                // BusinessAccount acc5 = (BusinessAccount)acc3;
+                BusinessAccount acc5 = acc3 as BusinessAccount; // Sintaxe alternativa
+                acc5.Loan(200.0);
+                Console.WriteLine("Loan!");
             }
-
-            Console.WriteLine("\nORDER SUMMARY:");
-            Console.WriteLine(order);
+            if (acc3 is SavingsAccount)
+            {
+                // SavingsAccount acc5 = (SavingsAccount)acc3;
+                SavingsAccount acc5 = acc3 as SavingsAccount; // Sintaxe alternativa
+                acc5.UpdateBalance();
+                Console.WriteLine("Update!");
+            }
         }
     }
 }
