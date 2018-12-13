@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Collections.Generic;
 using CursoCSharpUdemy.Entities;
+using CursoCSharpUdemy.Entities.Enums;
 
 namespace CursoCSharpUdemy
 {
@@ -9,32 +10,44 @@ namespace CursoCSharpUdemy
     {
         static void Main(string[] args)
         {
-            Post p1 = new Post(
-                DateTime.Parse("21/06/2018 13:05:44"),
-                "Traveling to New Zealand",
-                "I'm going to visit this wonderful country!",
-                12);
+            Console.WriteLine("Enter client data:");
+            Console.Write("Name: ");
+            string name = Console.ReadLine();
+            Console.Write("Email: ");
+            string email = Console.ReadLine();
+            Console.Write("Birth date (DD/MM/YYYY): ");
+            DateTime birthDate = DateTime.Parse(Console.ReadLine());
 
-            Comment c1 = new Comment("Have a nice trip!");
-            Comment c2 = new Comment("Wow, that's awesome!");
+            Client client = new Client(name, email, birthDate);
 
-            p1.AddComment(c1);
-            p1.AddComment(c2);
+            Console.WriteLine("\nEnter order data:");
+            Console.Write("Status (PendingPayment/Processing/Shipped/Delivered): ");
+            OrderStatus status = Enum.Parse<OrderStatus>(Console.ReadLine());
 
-            Post p2 = new Post(
-                DateTime.Parse("28/07/2018 23:14:19"),
-                "Good night guys",
-                "See you tomorrow!",
-                5);
+            Order order = new Order(DateTime.Now, status, client);
 
-            Comment c3 = new Comment("Good night");
-            Comment c4 = new Comment("May the Force be with you");
+            Console.Write("How many items to this order? ");
+            int itemQtty = int.Parse(Console.ReadLine());
 
-            p2.AddComment(c3);
-            p2.AddComment(c4);
+            for (int i = 1; i <= itemQtty; i++)
+            {
+                Console.WriteLine("\nEnter #" + i + " item data:");
+                Console.Write("Product name: ");
+                string productName = Console.ReadLine();
+                Console.Write("Product price: ");
+                double productPrice = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
 
-            Console.WriteLine(p1);
-            Console.WriteLine(p2);
+                Product product = new Product(productName, productPrice);
+
+                Console.Write("Quantity: ");
+                int productQtty = int.Parse(Console.ReadLine());
+
+                OrderItem item = new OrderItem(product, productQtty);
+                order.AddOrderItem(item);
+            }
+
+            Console.WriteLine("\nORDER SUMMARY:");
+            Console.WriteLine(order);
         }
     }
 }
