@@ -20,7 +20,7 @@ namespace CursoCSharpUdemy.Entities
 
         public override string PriceTag()
         {
-            return Name + " R$ " + Price.ToString("F2", CultureInfo.InvariantCulture) + " (Customs fee: R$ " + CustomsFee.ToString("F2", CultureInfo.InvariantCulture) + ")";
+            return Name + " R$ " + (Price + CustomsFee).ToString("F2", CultureInfo.InvariantCulture) + " (Customs fee: R$ " + CustomsFee.ToString("F2", CultureInfo.InvariantCulture) + ")";
         }
     }
 }
