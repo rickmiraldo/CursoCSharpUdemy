@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Collections.Generic;
 using CursoCSharpUdemy.Entities;
+using CursoCSharpUdemy.Entities.Enums;
 
 namespace CursoCSharpUdemy
 {
@@ -9,40 +10,38 @@ namespace CursoCSharpUdemy
     {
         static void Main(string[] args)
         {
-            List<Product> products = new List<Product>();
+            List<Shape> shapes = new List<Shape>();
 
-            Console.Write("Enter the number of products: ");
+            Console.Write("Enter the number of shapes: ");
             int n = int.Parse(Console.ReadLine());
 
             for (int i = 1; i <= n; i++)
             {
-                Console.WriteLine($"\nProduct #{i} data:");
-                Console.Write("Common, used or imported (c/u/i)? ");
+                Console.WriteLine($"\nShape #{i} data:");
+                Console.Write("Rectangle ot Circle (r/c): ");
                 char ch = char.Parse(Console.ReadLine());
-                Console.Write("Name: ");
-                string name = Console.ReadLine();
-                Console.Write("Price: ");
-                double price = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-                if (ch == 'i')
+                Console.Write("Color (Black/Blue/Red): ");
+                Color color = Enum.Parse<Color>(Console.ReadLine());
+
+                if (ch == 'r')
                 {
-                    Console.Write("Customs fee: ");
-                    double customs = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-                    products.Add(new ImportedProduct(name, price, customs));
-                } else if (ch == 'u')
-                {
-                    Console.Write("Manufacture date (DD/MM/YYYY): ");
-                    DateTime date = DateTime.Parse(Console.ReadLine());
-                    products.Add(new UsedProduct(name, price, date));
+                    Console.Write("Width: ");
+                    double w = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                    Console.Write("Height: ");
+                    double h = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                    shapes.Add(new Rectangle(w, h, color));
                 } else
                 {
-                    products.Add(new Product(name, price));
+                    Console.Write("Radius: ");
+                    double r = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                    shapes.Add(new Circle(r, color));
                 }
             }
 
-            Console.WriteLine("\nPRICE TAGS:");
-            foreach (Product p in products)
+            Console.WriteLine("\nSHAPE AREAS:");
+            foreach (Shape s in shapes)
             {
-                Console.WriteLine(p.PriceTag());
+                Console.WriteLine(s.Area().ToString("F2",CultureInfo.InvariantCulture));
             }
         }
     }
