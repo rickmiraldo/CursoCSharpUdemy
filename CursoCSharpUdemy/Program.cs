@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Collections.Generic;
+using System.IO;
 using CursoCSharpUdemy.Entities;
 
 namespace CursoCSharpUdemy
@@ -9,42 +10,44 @@ namespace CursoCSharpUdemy
     {
         static void Main(string[] args)
         {
-            List<TaxPayer> taxPayers = new List<TaxPayer>();
+            Console.Write("Full path of original CSV file: ");
+            string originalFilePath = Console.ReadLine();
 
-            Console.Write("Enter the number of tax payers: ");
-            int n = int.Parse(Console.ReadLine());
+            List<Product> products = new List<Product>();
 
-            for (int i = 1; i <= n; i++)
+            try
             {
-                Console.WriteLine($"\nTax payer #{i} data:");
-                Console.Write("Individual or Company (i/c)? ");
-                char ch = char.Parse(Console.ReadLine());
-                Console.Write("Name: ");
-                string name = Console.ReadLine();
-                Console.Write("Anual income: ");
-                double income = double.Parse(Console.ReadLine(),CultureInfo.InvariantCulture);
-                if (ch == 'i')
+                string[] lines = File.ReadAllLines(originalFilePath);
+                foreach (string l in lines)
                 {
-                    Console.Write("Individual expenditures: ");
-                    double exp = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-                    taxPayers.Add(new Individual(name, income, exp));
-                } else
-                {
-                    Console.Write("Number of employees: ");
-                    int emp = int.Parse(Console.ReadLine());
-                    taxPayers.Add(new Company(name, income, emp));
+                    string[] fields = l.Split(',');
+                    string name = fields[0];
+                    double price = double.Parse(fields[1],CultureInfo.InvariantCulture);
+                    int quantity = int.Parse(fields[2]);
+                    products.Add(new Product(name, price, quantity));
                 }
-            }
 
-            Console.WriteLine("\nTAXES PAID;");
-            double sum = 0.0;
-            foreach (TaxPayer tp in taxPayers)
+                string workingDirectory = Path.GetDirectoryName(originalFilePath);
+                Directory.CreateDirectory(workingDirectory + @"\out");
+                string outputFilePath = workingDirectory + @"\out\summary.csv";
+
+                using (FileStream fs = new FileStream(outputFilePath, FileMode.Create))
+                {
+                    using (StreamWriter sw = new StreamWriter(fs))
+                    {
+                        foreach (Product p in products)
+                        {
+                            sw.WriteLine(p.Name + "," + p.GetTotal().ToString("F2",CultureInfo.InvariantCulture));
+                        }
+                    }
+                }
+
+            }
+            catch (IOException e)
             {
-                Console.WriteLine(tp.Name + ": R$ " + tp.CalculateTax().ToString("F2",CultureInfo.InvariantCulture));
-                sum += tp.CalculateTax();
+                Console.Write("An error has occurred: ");
+                Console.WriteLine(e.Message);
             }
-
-            Console.WriteLine("\nTOTAL TAXES: R$ " + sum.ToString("F2",CultureInfo.InvariantCulture));
         }
     }
 }
