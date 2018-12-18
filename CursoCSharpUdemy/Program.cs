@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.IO;
 using CursoCSharpUdemy.Entities;
+using CursoCSharpUdemy.Services;
 
 namespace CursoCSharpUdemy
 {
@@ -10,44 +11,27 @@ namespace CursoCSharpUdemy
     {
         static void Main(string[] args)
         {
-            Console.Write("Full path of original CSV file: ");
-            string originalFilePath = Console.ReadLine();
+            Console.WriteLine("Enter rental data:");
+            Console.Write("Car model: ");
+            string model = Console.ReadLine();
+            Console.Write("Pickup (DD/MM/YYYY HH:MM): ");
+            DateTime start = DateTime.ParseExact(Console.ReadLine(), "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+            Console.Write("Return (DD/MM/YYYY HH:MM): ");
+            DateTime finish = DateTime.ParseExact(Console.ReadLine(), "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
 
-            List<Product> products = new List<Product>();
+            CarRental carRental = new CarRental(start, finish, new Vehicle(model));
 
-            try
-            {
-                string[] lines = File.ReadAllLines(originalFilePath);
-                foreach (string l in lines)
-                {
-                    string[] fields = l.Split(',');
-                    string name = fields[0];
-                    double price = double.Parse(fields[1],CultureInfo.InvariantCulture);
-                    int quantity = int.Parse(fields[2]);
-                    products.Add(new Product(name, price, quantity));
-                }
+            Console.Write("Enter price per hour: ");
+            double hour = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+            Console.Write("Enter price per day: ");
+            double day = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
 
-                string workingDirectory = Path.GetDirectoryName(originalFilePath);
-                Directory.CreateDirectory(workingDirectory + @"\out");
-                string outputFilePath = workingDirectory + @"\out\summary.csv";
+            RentalService rentalService = new RentalService(hour, day, new BrazilTaxService());
 
-                using (FileStream fs = new FileStream(outputFilePath, FileMode.Create))
-                {
-                    using (StreamWriter sw = new StreamWriter(fs))
-                    {
-                        foreach (Product p in products)
-                        {
-                            sw.WriteLine(p.Name + "," + p.GetTotal().ToString("F2",CultureInfo.InvariantCulture));
-                        }
-                    }
-                }
+            rentalService.ProcessInvoice(carRental);
 
-            }
-            catch (IOException e)
-            {
-                Console.Write("An error has occurred: ");
-                Console.WriteLine(e.Message);
-            }
+            Console.WriteLine("\nINVOICE:");
+            Console.WriteLine(carRental.Invoice);
         }
     }
 }
