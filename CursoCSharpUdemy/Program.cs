@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.IO;
 using CursoCSharpUdemy.Entities;
-using CursoCSharpUdemy.Services;
+using CursoCSharpUdemy.Entities.Exceptions;
 
 namespace CursoCSharpUdemy
 {
@@ -11,25 +11,36 @@ namespace CursoCSharpUdemy
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Enter contract data:");
-            Console.Write("Number: ");
-            int number = int.Parse(Console.ReadLine());
-            Console.Write("Date (DD/MM/YYYY): ");
-            DateTime date = DateTime.ParseExact(Console.ReadLine(), "dd/MM/yyyy", CultureInfo.InvariantCulture);
-            Console.Write("Contract value: ");
-            double value = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-            Console.Write("Enter number of installments: ");
-            int installments = int.Parse(Console.ReadLine());
-
-            Contract contract = new Contract(number, date, value);
-            ContractService contractService = new ContractService(new PayPalService());
-
-            contractService.ProcessContract(contract, installments);
-
-            Console.WriteLine("\nINSTALLMENTS:");
-            foreach (Installment installment in contract.Installments)
+            try
             {
-                Console.WriteLine(installment);
+                Console.WriteLine("Enter account data:");
+                Console.Write("Number: ");
+                int number = int.Parse(Console.ReadLine());
+                Console.Write("Holder: ");
+                string name = Console.ReadLine();
+                Console.Write("Initial balance: ");
+                double balance = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                Console.Write("Withdraw limit: ");
+                double limit = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+
+                Account acc = new Account(number, name, balance, limit);
+
+                Console.Write("\nEnter amount for withdraw: ");
+                double amount = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+                acc.Withdraw(amount);
+                Console.WriteLine("New balance: " + acc.Balance.ToString("F2", CultureInfo.InvariantCulture));
+            }
+            catch (DomainException e)
+            {
+                Console.WriteLine("Withdraw error: " + e.Message);
+            }
+            catch (FormatException e)
+            {
+                Console.WriteLine("Format error: " + e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unexpected error: " + e.Message);
             }
         }
     }
